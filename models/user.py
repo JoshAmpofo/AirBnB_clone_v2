@@ -5,7 +5,7 @@ from models.base_model import BaseModel, Base
 from sqlalchemy import Column, Integer, String
 
 
-class User(BaseModel):
+class User(BaseModel, Base):
     """Defines User class with the following attributes
 
     email(str): user login email
