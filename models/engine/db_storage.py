@@ -9,9 +9,9 @@ from models.base_model import Base
 from models.user import User
 from models.city import City
 from models.state import State
-from model.place import Place
+from models.place import Place
 from models.amenity import Amenity
-from models.revie import Review
+from models.review import Review
 
 
 class DBStorage:
@@ -35,47 +35,47 @@ class DBStorage:
         if env == 'test':
             Base.metadata.drop_all(bind=self.__engine)
 
-        def all(self, cls=None):
-            """Queries db session for all objects depending on the class name
-            Returns a dict
-            """
-            result = {}
-            mod_args = [User, State, City, Amenity, Place, Review]
-            if cls:
-                if type(cls) == str:
-                    cls = eval(cls)
-                objs = self.__session.query(cls).all()
+    def all(self, cls=None):
+        """Queries db session for all objects depending on the class name
+        Returns a dict
+        """
+        result = {}
+        mod_args = [User, State, City, Amenity, Place, Review]
+        if cls:
+            if type(cls) == str:
+                cls = eval(cls)
+            objs = self.__session.query(cls).all()
+            for obj in objs:
+                key = '{}.{}'.format(type(obj).__name__, obj.id)
+                result[key] = obj
+        else:
+            for clas in mod_args:
+                objs = self.__session.query(clas).all()
                 for obj in objs:
                     key = '{}.{}'.format(type(obj).__name__, obj.id)
                     result[key] = obj
-            else:
-                for clas in mod_args:
-                    objs = self.__session.query(clas).all()
-                    for obj in objs:
-                        key = '{}.{}'.format(type(obj).__name__, obj.id)
-                        result[key] = obj
-            return result
+        return result
 
-        def new(self, obj):
-            """Add object to current db session"""
-            self.__session.add(obj)
+    def new(self, obj):
+        """Add object to current db session"""
+        self.__session.add(obj)
 
-        def save(self):
-            """Commit all changes in current db session"""
-            self.__session.commit()
+    def save(self):
+        """Commit all changes in current db session"""
+        self.__session.commit()
 
-        def delete(self, obj=None):
-            """Delete from the current db session, obj if not none"""
-            if obj is not None:
-                self.__session.delete(obj)
+    def delete(self, obj=None):
+        """Delete obj from current db session if not none"""
+        if obj is not None:
+            self.__session.delete(obj)
 
-        def reload(self):
-            """creates all tables in the db"""
-            Base.metadata.create_all(self.__engine)
-            session_factory = sessionmaker(bind=self.__engine,
-                                           expire_on_commit=False)
-            self.__session = scoped_session(session_factory)()
+    def reload(self):
+        """creates all tables in the db"""
+        Base.metadata.create_all(self.__engine)
+        session_factory = sessionmaker(bind=self.__engine,
+                                       expire_on_commit=False)
+        self.__session = scoped_session(session_factory)()
 
-        def close(self):
-            """Remove session"""
-            self.__session.remove()
+    def close(self):
+        """Remove session"""
+        self.__session.remove()
