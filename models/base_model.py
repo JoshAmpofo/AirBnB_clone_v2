@@ -11,9 +11,9 @@ Base = declarative_base()
 
 class BaseModel:
     """A base class for all Airbnb models"""
-    id = Column(String(60), unique=True, primary_key=True, nullabale=False)
-    created_at = Column(DateTime, default=(datetime.utcnow()), nullable=False)
-    update_at = Column(DateTime, default=(datetime.utcnow()), nullable=False)
+    id = Column(String(60), unique=True, nullable=False, primary_key=True)
+    created_at = Column(DateTime, nullable=False, default=(datetime.utcnow()))
+    update_at = Column(DateTime, nullable=False, default=(datetime.utcnow()))
 
     def __init__(self, *args, **kwargs):
         """Instantiates a new model
@@ -56,14 +56,14 @@ class BaseModel:
 
     def to_dict(self):
         """Convert instance into dict format and returns __dict__ value"""
-        dictionary = dict(self.__dict__)
-        dictionary['__class__'] = str(type(self).__name__)
-        dictionary['created_at'] = self.created_at.isoformat()
-        dictionary['updated_at'] = self.updated_at.isoformat()
-        if '_sa_instance_state' in dictionary.keys():
-            del dictionary["_sa_instance_state"]
-        return dictionary
+        new_dict = self.__dict__.copy()
+        if '_sa_instance_state' in new_dict:
+            del new_dict['_sa_instance_state']
+        new_dict['__class__'] = str(type(self).__name__)
+        new_dict['created_at'] = self.created_at.isoformat()
+        new_dict['updated_at'] = self.updated_at.isoformat()
+        return new_dict
 
     def delete(self):
-        """Deletes current instance fro storage"""
+        """Deletes current instance from storage"""
         models.storage.delete(self)

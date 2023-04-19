@@ -9,7 +9,7 @@ from models.city import City
 from models.place import Place
 from models.amenity import Amenity
 from models.review import Review
-import os
+from os import getenv
 
 
 env = getenv('HBNB_TYPE_STORAGE')
