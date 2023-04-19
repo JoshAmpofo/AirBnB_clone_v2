@@ -1,11 +1,21 @@
 #!/usr/bin/python3
 """Define Place class for Airbnb console"""
+import models
 from sqlalchemy.ext.declarative import declarative_base
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, Integer, String, ForeignKey, Float
 from sqlalchemy.orm import relationship
 from models.review import Review
 from os import getenv
+
+
+place_amenity = Table('place_amenity', Base.metadata,
+                      Column('place.id', String(60),
+                             ForeignKey('places.id'), primary_key=True,
+                             nullable=False),
+                      Column('amenity_id', String(60),
+                             ForeignKey('amenities.id'), primary_key=True,
+                             nullable=False))
 
 
 class Place(BaseModel, Base):
@@ -21,6 +31,7 @@ class Place(BaseModel, Base):
     price_by_night(int): unit price of place per night
     latitude(float): GPS coordinates of place
     longitude(float): GPS coordinates of place
+    amenity_ids(list): list of all amenity ids generated
     """
 
     __tablename__ = 'places'
@@ -50,3 +61,14 @@ class Place(BaseModel, Base):
                              mod_args[key].place_id == self.id and
                              key.replace(".", " ").split[0] == 'Review']
             return mod_args_list
+
+        @property
+        def amenities(self):
+            """returns list of all amenity ids"""
+            return self.amenity_ids
+
+        @amenities.setter
+        def amenities(self, obj=None):
+            """append method for adding amenity.id to amenity_ids"""
+            if type(obj) is Amenity and obj.id not in self.amenity_ids:
+                self.amenity_ids.append(obj.id)
