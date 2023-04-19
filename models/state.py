@@ -22,5 +22,5 @@ class State(BaseModel):
         mod_args_list = [mod_args[key] for key in mod_args.keys() if
                          isinstance(mod_args[key], City) and
                          mod_args[key].state_id == self.id and
-                         key.replace(".", " ").split[0] == 'CIty']
+                         key.replace(".", " ").split[0] == 'City']
         return mod_args_list
