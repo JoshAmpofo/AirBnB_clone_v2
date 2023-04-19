@@ -3,13 +3,16 @@
 from sqlalchemy.ext.declarative import declarative_base
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, Integer, String, ForeignKey, Float
+from sqlalchemy.orm import relationship
+from models.review import Review
+from os import getenv
 
 
 class Place(BaseModel, Base):
     """defines place attributes for user
 
     city_id(str): id of city where place is located
-    user_id(str): id of user 
+    user_id(str): id of user
     name (str): name of place
     description(str): brief description of place
     number_rooms(int): number of rooms in place
@@ -19,7 +22,7 @@ class Place(BaseModel, Base):
     latitude(float): GPS coordinates of place
     longitude(float): GPS coordinates of place
     """
-    
+
     __tablename__ = 'places'
     city_id = Column(String(60), ForeignKey('cities.id'), nullable=False)
     user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
@@ -32,3 +35,18 @@ class Place(BaseModel, Base):
     latitude = Column(Float)
     longitude = Column(Float)
     amenity_ids = []
+
+    env = getenv('HBNB_TYPE_STORAGE')
+
+    if env == 'db':
+        reviews = relationship('Review', cascade='all, delete, delete-orphan',
+                               backref='place')
+    else:
+        @property
+        def reviews(self):
+            mod_args = model.storage.all()
+            mod_args_list = [mod_args[key] for key in mod_args.keys() if
+                             isinstance(mod_args[key], Review) and
+                             mod_args[key].place_id == self.id and
+                             key.replace(".", " ").split[0] == 'Review']
+            return mod_args_list
